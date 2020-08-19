@@ -5,47 +5,76 @@ import Main from './Main';
 import Footer from './Footer';
 import PopupWithForm from './PopupWithForm';
 
-
-
-function handleEditAvatarClick() {
-  document.querySelector('#popup-avatar').classList.add('popup_state_opened');
-  }
-function handleEditProfileClick() {
-  document.querySelector('#popup-author').classList.add('popup_state_opened');
-}
-function handleAddPlaceClick() {
-  document.querySelector('#popup-place').classList.add('popup_state_opened');
-} 
-
-let isEditProfilePopupOpen = false;
-let isAddPlacePopupOpen = false;
-let isEditAvatarPopupOpen = false;
-
-
 function App() {
+
+  const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
+  const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
+  const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
+
+
+  function closeAllPopups() {
+    setIsEditAvatarPopupOpen(false);
+    setIsAddPlacePopupOpen(false);
+    setIsEditProfilePopupOpen(false); 
+  }
+
+  function handleEditAvatarClick() { 
+    setIsEditAvatarPopupOpen(true);
+  }
+  function handleAddPlaceClick() {
+    setIsAddPlacePopupOpen(true);
+  }   
+  function handleEditProfileClick() {
+    setIsEditProfilePopupOpen(true);
+  }
+  
   return (
 <div className="page">
   <Header />
-  <Main onEditAvatar={handleEditAvatarClick}  onEditProfile={handleEditProfileClick} onEditAvatar={handleAddPlaceClick} />
-  <PopupWithForm name='popup_author_form' title='Редактировать профиль' />
-  <PopupWithForm name='popup_place_form' title='Новое место' />
-  <PopupWithForm name='popup_delete' title='Вы уверены?' />
-  <PopupWithForm name='popup_avatar' title='Обновите аватар' />
+  <Main onEditAvatar={handleEditAvatarClick}  onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} />
+
+  <PopupWithForm id='popup-author' name='popup_author_form' title='Редактировать профиль' isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} >
+    <fieldset className="popup__form-author-info">
+      <input id="author-input" type="text" name="author" minLength="2" maxLength="40" required placeholder="Введите имя" className="popup__input"/>
+      <span id="author-input-error" className="popup__error_visible"></span>
+      <input id="metier-input" type="text" name="metier" minLength="2" maxLength="200" required placeholder="Введите род занятий"  className="popup__input" />
+      <span id="metier-input-error" className="popup__error_visible"></span>
+    </fieldset> 
+    <button type="submit" className="popup__button-save">Сохранить</button>                   
+  </PopupWithForm> 
+
+  <PopupWithForm id='popup-place' name='popup_place_form' title='Новое место' isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
+  <fieldset className="popup__form-author-info">
+    <input id="place-input" type="text" name="place" minLength="1" maxLength="30" required placeholder="Название" className="popup__input"/>
+    <span id="place-input-error" className="popup__error_visible"></span>
+    <input id="url-input" type="url" name="url" required placeholder="Ссылка на картинку" className="popup__input" />
+    <span id="url-input-error" className="popup__error_visible"></span>
+  </fieldset> 
+  <button type="submit" className="popup__button-save">Создать</button>  
+  </PopupWithForm>  
+
+  {/* <PopupWithForm id='popup-delete' name='popup_delete' title='Вы уверены?'>
+    <button type="submit"  className="popup__button-save">Да</button>                   
+  </PopupWithForm> */}
+
+  <PopupWithForm id='popup-avatar' name='popup_avatar' title='Обновите аватар' isOpen={isEditAvatarPopupOpen}  onClose={closeAllPopups}>
+
+  <fieldset className="popup__form-author-info">
+    <input id="url-input" type="url" name="url" required placeholder="Ссылка на аватар" className="popup__input"/>
+    <span id="url-input-error" className="popup__error_visible"></span>
+  </fieldset> 
+  <button type="submit"  className="popup__button-save">Сохранить</button>    
+
+  </PopupWithForm>
+  
   <Footer />
 </div>      
   );
 
-  // function handle() {
-  //   const popupAuthor = document.querySelector('#popup-author');
-  //   popupAuthor.classList.add('popup_state_opened')
-  // }
-  // const editButton = document.querySelector('.profile__info-edit-button');
-  // editButton.addEventListener('click', console.log('hi!'));
-  // const addButton = document.querySelector('.profile__add-button');
-  // addButton.addEventListener('click', console.log('hi!'));
-
 }
 
 export default App;
+
+
 
 
