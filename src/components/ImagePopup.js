@@ -1,15 +1,16 @@
 import React from 'react';
 
-function ImagePopup() {
+function ImagePopup(props) {
+    const selectedCard = props.card;
     return (
-        <section id='popup-view' className="popup">
-          <div className="popup__overlay"> </div>
-          <div className="popup__container-view">
-              <button type="button" name='closePlace' className="popup__close-icon"></button>
-              <img src="#" alt="" className="popup__img-view"/>
-              <h2 className="popup__title-view"></h2>               
-          </div>
-      </section>
+        <section id='popup-view' className={selectedCard ? "popup popup_state_opened" : "popup"}>
+            <div className="popup__overlay" onClick={props.onClose}> </div>
+            <div className="popup__container-view">
+                <button type="button" name='closePlace' className="popup__close-icon" onClick={props.onClose}></button>
+                <img src={selectedCard.link} alt="" className="popup__img-view" />
+                <h2 className="popup__title-view">{selectedCard.name}</h2>
+            </div>
+        </section>
     );
 }
 
