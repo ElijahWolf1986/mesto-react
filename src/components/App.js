@@ -1,5 +1,4 @@
 import React from 'react';
-import '../index.css';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
@@ -11,17 +10,17 @@ function App() {
   const [isEditProfilePopupOpen, setIsEditProfilePopupOpen] = React.useState(false);
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
-  const [selectedCard, setSelectedCard] = React.useState(false);
+  const [selectedCard, setSelectedCard] = React.useState();
 
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
     setIsAddPlacePopupOpen(false);
     setIsEditProfilePopupOpen(false);
-    setSelectedCard(false);
+    setSelectedCard(undefined);
   }
 
-  function handleCardClick(onCardClick) {
-    setSelectedCard(onCardClick);
+  function handleCardClick(selectedCard) {
+    setSelectedCard(selectedCard);
   }
 
   function handleEditAvatarClick() {
@@ -38,7 +37,7 @@ function App() {
     <div className="page">
       <Header />
 
-      <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} onCardClick={handleCardClick} />
+      <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} selectedCard={handleCardClick} />
 
       <PopupWithForm id='popup-author' name='popup_author_form' title='Редактировать профиль' isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} >
         <fieldset className="popup__form-author-info">
