@@ -43,13 +43,13 @@ class Api {
             .then(this._handleResponse)
             .catch(this._handleResponseError)
     }
-    setNewCard(name, link) {
+    setNewCard(newCard) {
         return fetch(`${this._url}/cards`, {
             method: 'POST',
             headers: this._headers,
             body: JSON.stringify({
-                name: `${name}`,
-                link: `${link}`
+                name: `${newCard.name}`,
+                link: `${newCard.link}`
             })
         })
             .then(this._handleResponse)

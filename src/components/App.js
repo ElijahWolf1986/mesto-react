@@ -2,12 +2,13 @@ import React from 'react';
 import Header from './Header';
 import Main from './Main';
 import Footer from './Footer';
-import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
 import EditProfilePopup from './EditProfilePopup';
 import EditAvatarPopup from './EditAvatarPopup';
+import AddPlacePopup from './AddPlacePopup';
 import { CurrentUserContext } from '../contexts/CurrentUserContext';
 import myApi from '../utils/api';
+
 
 function App() {
 
@@ -16,6 +17,48 @@ function App() {
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
   const [currentUser, setCurrentUser] = React.useState({});
+  const [cards, setCards] = React.useState([]);
+
+  function handleCardLike(card) {
+    const isLiked = card.likes.some(i => i._id === currentUser._id);
+    if (!isLiked) {
+      myApi.setLike(card._id)
+        .then((newCard) => {
+          const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+          setCards(newCards);
+        })
+        .catch((err) => {
+          console.log(`Ошибка отправки лайка... ${err}`);
+        })
+    } else {
+      myApi.delLike(card._id)
+        .then((newCard) => {
+          const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+          setCards(newCards);
+        })
+        .catch((err) => {
+          console.log(`Ошибка отправки лайка... ${err}`);
+        })
+    }
+  }
+
+  function handleCardDelete(card) {
+    myApi.deleteCard(card._id)
+      .then(() => {
+        const newCards = cards.filter(c => c._id !== card._id);
+        setCards(newCards);
+      })
+  }
+
+  React.useEffect(() => {
+    myApi.getInitialCards()
+      .then((res) => {
+        setCards(res);
+      })
+      .catch((err) => {
+        console.log(`Ошибка получения данных... ${err}`);
+      })
+  }, []);
 
   React.useEffect(() => {
     myApi.getUserInfo()
@@ -64,24 +107,24 @@ function App() {
       })
   }
 
+  function handleAddPlaceSubmit(onAddPlace) {
+    myApi.setNewCard(onAddPlace)
+      .then((newCard) => {
+        setCards([...cards, newCard]);
+        closeAllPopups();
+      })
+  }
+
   return (
     <div className="page">
       <CurrentUserContext.Provider value={currentUser}>
         <Header />
 
-        <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} selectedCard={handleCardClick} />
+        <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} selectedCard={handleCardClick} cards={cards} onCardLike={handleCardLike} onCardDelete={handleCardDelete} />
 
         <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
 
-        <PopupWithForm id='popup-place' name='popup_place_form' title='Новое место' isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
-          <fieldset className="popup__form-author-info">
-            <input id="place-input" type="text" name="place" minLength="1" maxLength="30" required placeholder="Название" className="popup__input" />
-            <span id="place-input-error" className="popup__error_visible"></span>
-            <input id="url-input" type="url" name="url" required placeholder="Ссылка на картинку" className="popup__input" />
-            <span id="url-input-error" className="popup__error_visible"></span>
-          </fieldset>
-          <button type="submit" className="popup__button-save">Создать</button>
-        </PopupWithForm>
+        <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
 
         <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
 

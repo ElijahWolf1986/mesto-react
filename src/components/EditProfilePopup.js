@@ -34,7 +34,7 @@ function EditProfilePopup(props) {
             <fieldset className="popup__form-author-info">
                 <input id="author-input" type="text" value={name || ''} onChange={handleChangeName} name="author" minLength="2" maxLength="40" required placeholder="Введите имя" className="popup__input" />
                 <span id="author-input-error" className="popup__error_visible"></span>
-                <input id="metier-input" type="text" value={description || ''} onChange={handleChangeDescription}  name="metier" minLength="2" maxLength="200" required placeholder="Введите род занятий" className="popup__input" />
+                <input id="metier-input" type="text" value={description || ''} onChange={handleChangeDescription} name="metier" minLength="2" maxLength="200" required placeholder="Введите род занятий" className="popup__input" />
                 <span id="metier-input-error" className="popup__error_visible"></span>
             </fieldset>
             <button type="submit" className="popup__button-save">Сохранить</button>
