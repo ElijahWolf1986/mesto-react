@@ -4,6 +4,10 @@ import Main from './Main';
 import Footer from './Footer';
 import PopupWithForm from './PopupWithForm';
 import ImagePopup from './ImagePopup';
+import EditProfilePopup from './EditProfilePopup';
+import EditAvatarPopup from './EditAvatarPopup';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
+import myApi from '../utils/api';
 
 function App() {
 
@@ -11,6 +15,17 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = React.useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState();
+  const [currentUser, setCurrentUser] = React.useState({});
+
+  React.useEffect(() => {
+    myApi.getUserInfo()
+      .then((res) => {
+        setCurrentUser(res);
+      })
+      .catch((err) => {
+        console.log(`Ошибка получения данных о пользователе... ${err}`);
+      })
+  }, []);
 
   function closeAllPopups() {
     setIsEditAvatarPopupOpen(false);
@@ -33,43 +48,47 @@ function App() {
     setIsEditProfilePopupOpen(true);
   }
 
+  function handleUpdateUser(onUpdateUser) {
+    myApi.setUserInfo(onUpdateUser)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      })
+  }
+
+  function handleUpdateAvatar(onUpdateAvatar) {
+    myApi.setAvatar(onUpdateAvatar)
+      .then((res) => {
+        setCurrentUser(res);
+        closeAllPopups();
+      })
+  }
+
   return (
     <div className="page">
-      <Header />
+      <CurrentUserContext.Provider value={currentUser}>
+        <Header />
 
-      <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} selectedCard={handleCardClick} />
+        <Main onEditAvatar={handleEditAvatarClick} onEditProfile={handleEditProfileClick} onAddPlace={handleAddPlaceClick} selectedCard={handleCardClick} />
 
-      <PopupWithForm id='popup-author' name='popup_author_form' title='Редактировать профиль' isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} >
-        <fieldset className="popup__form-author-info">
-          <input id="author-input" type="text" name="author" minLength="2" maxLength="40" required placeholder="Введите имя" className="popup__input" />
-          <span id="author-input-error" className="popup__error_visible"></span>
-          <input id="metier-input" type="text" name="metier" minLength="2" maxLength="200" required placeholder="Введите род занятий" className="popup__input" />
-          <span id="metier-input-error" className="popup__error_visible"></span>
-        </fieldset>
-        <button type="submit" className="popup__button-save">Сохранить</button>
-      </PopupWithForm>
+        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
 
-      <PopupWithForm id='popup-place' name='popup_place_form' title='Новое место' isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
-        <fieldset className="popup__form-author-info">
-          <input id="place-input" type="text" name="place" minLength="1" maxLength="30" required placeholder="Название" className="popup__input" />
-          <span id="place-input-error" className="popup__error_visible"></span>
-          <input id="url-input" type="url" name="url" required placeholder="Ссылка на картинку" className="popup__input" />
-          <span id="url-input-error" className="popup__error_visible"></span>
-        </fieldset>
-        <button type="submit" className="popup__button-save">Создать</button>
-      </PopupWithForm>
+        <PopupWithForm id='popup-place' name='popup_place_form' title='Новое место' isOpen={isAddPlacePopupOpen} onClose={closeAllPopups}>
+          <fieldset className="popup__form-author-info">
+            <input id="place-input" type="text" name="place" minLength="1" maxLength="30" required placeholder="Название" className="popup__input" />
+            <span id="place-input-error" className="popup__error_visible"></span>
+            <input id="url-input" type="url" name="url" required placeholder="Ссылка на картинку" className="popup__input" />
+            <span id="url-input-error" className="popup__error_visible"></span>
+          </fieldset>
+          <button type="submit" className="popup__button-save">Создать</button>
+        </PopupWithForm>
 
-      <PopupWithForm id='popup-avatar' name='popup_avatar' title='Обновите аватар' isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups}>
-        <fieldset className="popup__form-author-info">
-          <input id="url-input" type="url" name="url" required placeholder="Ссылка на аватар" className="popup__input" />
-          <span id="url-input-error" className="popup__error_visible"></span>
-        </fieldset>
-        <button type="submit" className="popup__button-save">Сохранить</button>
-      </PopupWithForm>
+        <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
 
-      <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <ImagePopup card={selectedCard} onClose={closeAllPopups} />
 
-      <Footer />
+        <Footer />
+      </CurrentUserContext.Provider>
     </div>
   );
 }

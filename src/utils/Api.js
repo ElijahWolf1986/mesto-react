@@ -1,4 +1,4 @@
-import configApi from './Utils';
+import configApi from './utils.js';
 
 class Api {
     constructor({ url, headers = {} }) {
@@ -20,7 +20,7 @@ class Api {
         return Promise.reject(err.message);
     }
 
-    getInitialCards() { //worked
+    getInitialCards() { 
         return fetch(`${this._url}/cards`, { headers: this._headers })
             .then(this._handleResponse)
             .catch(this._handleResponseError)
@@ -31,13 +31,13 @@ class Api {
             .then(this._handleResponse)
             .catch(this._handleResponseError)
     }
-    setUserInfo(name, about) {
+    setUserInfo(newUserInfo) {
         return fetch(`${this._url}/users/me`, {
             method: 'PATCH',
             headers: this._headers,
             body: JSON.stringify({
-                name: `${name}`,
-                about: `${about}`
+                name: `${newUserInfo.name}`,
+                about: `${newUserInfo.about}`
             })
         })
             .then(this._handleResponse)
@@ -88,7 +88,7 @@ class Api {
             method: 'PATCH',
             headers: this._headers,
             body: JSON.stringify({
-                avatar: `${avatar}`
+                avatar: `${avatar.avatar}`
             })
         })
             .then(this._handleResponse)

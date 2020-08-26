@@ -3,7 +3,7 @@ import React from 'react';
 function ImagePopup(props) {
     const selectedCard = props.card;
     return (
-        <section id='popup-view' className={selectedCard ? "popup popup_state_opened" : "popup"}>
+        <section id='popup-view' className={`popup ${selectedCard && 'popup_state_opened'}`}>
             <div className="popup__overlay" onClick={props.onClose}> </div>
             <div className="popup__container-view">
                 <button type="button" name='closePlace' className="popup__close-icon" onClick={props.onClose}></button>

@@ -1,25 +1,42 @@
 import React from 'react';
-import avatar from '../images/profile/download.jpg';
-import myApi from '../utils/Api';
+import myApi from '../utils/api';
 import Card from './Card';
+import { CurrentUserContext } from '../contexts/CurrentUserContext';
 
 function Main(props) {
-    const [userName, setUserName] = React.useState('Жак-Ив Кусто');
-    const [userDescription, setUserDescription] = React.useState('Исследователь океана');
-    const [userAvatar, setUserAvatar] = React.useState(avatar);
+    const currentUser = React.useContext(CurrentUserContext);
     const [cards, setCards] = React.useState([]);
 
-    React.useEffect(() => {
-        myApi.getUserInfo()
-            .then((res) => {
-                setUserName(res.name);
-                setUserDescription(res.about);
-                setUserAvatar(res.avatar);
+    function handleCardLike(card) {
+        const isLiked = card.likes.some(i => i._id === currentUser._id);
+        if (!isLiked) {
+            myApi.setLike(card._id)
+                .then((newCard) => {
+                    const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+                    setCards(newCards);
+                })
+                .catch((err) => {
+                    console.log(`Ошибка отправки лайка... ${err}`);
+                })
+        } else {
+            myApi.delLike(card._id)
+                .then((newCard) => {
+                    const newCards = cards.map((c) => c._id === card._id ? newCard : c);
+                    setCards(newCards);
+                })
+                .catch((err) => {
+                    console.log(`Ошибка отправки лайка... ${err}`);
+                })
+        }
+    }
+
+    function handleCardDelete(card) {
+        myApi.deleteCard(card._id)
+            .then(() => {
+                const newCards = cards.filter(c => c._id !== card._id);
+                setCards(newCards);
             })
-            .catch((err) => {
-                console.log(`Ошибка получения данных о пользователе... ${err}`);
-            })
-    }, []);
+    }
 
     React.useEffect(() => {
         myApi.getInitialCards()
@@ -36,14 +53,14 @@ function Main(props) {
             <section className="profile">
                 <div className="profile__wrapper">
                     <div className="profile__edit" onClick={props.onEditAvatar}>
-                        <img src={userAvatar} alt="аватар" className="profile__avatar" />
+                        <img src={currentUser.avatar} alt="аватар" className="profile__avatar" />
                     </div>
                     <div className="profile__data-container">
                         <div className="profile__info">
-                            <h1 className="profile__info-title">{userName}</h1>
+                            <h1 className="profile__info-title">{currentUser.name}</h1>
                             <button type="button" onClick={props.onEditProfile} className="profile__info-edit-button"></button>
                         </div>
-                        <p className="profile__info-subtitle">{userDescription}</p>
+                        <p className="profile__info-subtitle">{currentUser.about}</p>
                     </div>
                 </div>
                 <button type="button" onClick={props.onAddPlace} className="profile__add-button"></button>
@@ -51,7 +68,7 @@ function Main(props) {
             <section className="gallery">
                 {cards.map((item, id) => {
                     return (
-                        <Card card={item} key={id} onCardClick={props.selectedCard} />
+                        <Card card={item} key={id} onCardClick={props.selectedCard} onCardLike={handleCardLike} onCardDelete={handleCardDelete} />
                     )
                 })}
             </section>
