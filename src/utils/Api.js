@@ -1,4 +1,4 @@
-import configApi from './utils.js';
+import configApi from './Utils.js';
 
 class Api {
     constructor({ url, headers = {} }) {
